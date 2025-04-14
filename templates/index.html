@@ -5,38 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog App</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            background-image: url('/static/images/blogging.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 30px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-bottom: 2px solid #ccc;
+        }
+
+        .navbar a, .navbar p {
+            text-decoration: none;
+            color: #333;
+            padding: 8px 14px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .navbar p {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .post {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .post h2 {
+            margin: 0;
+        }
+
+        .post a, .post button {
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .after-login-images {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+    </style>
 </head>
 <body>
-    <h1>Blog Posts</h1>
 
-   
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        {% if username %}
+            <p>Welcome, {{ username }}!</p>
+            <a href="/create_post">Create Post</a>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+        {% endif %}
+    </div>
 
-    <!-- Displaying the main blog image -->
-<style>
-body {
-  background-image: url('static/images/blogging.png');
-  background-repeat: no-repeat;
-  background-size: 100vw 100vh; /* Ensures full-screen coverage */
-  background-position: center; /* Centers the image */
-  background-attachment: fixed; /* Keeps the background static */
-  image-rendering: high-quality; /* Improves image clarity */
-}
-</style>
+    {% if username %}
+    <div class="after-login-images">
+        <img src="/static/images/signup-img (1).png" alt="signup-img" style="width: 300px; margin-right: 20px;">
+        <img src="/static/images/login-img.png" alt="login-img" style="width: 300px;">
+    </div>
+{% endif %}
 
 
 
-    <a href="/create_post">Create New Post</a>
-    <div>
+    <div class="container">
+        <h1>Blog Posts</h1>
+
         {% for post in blogs %}
         <div class="post">
-            <h2>{{loop.index}}. {{ post.title }}</h2>
+            <h2>{{ loop.index }}. {{ post.title }}</h2>
             <p>{{ post.content[:100] }}...</p>
-            <a href="/post/{{ loop.index0 }}">Read More</a>
-            <form method="post" action="/delete_post/{{ loop.index0 }}">
+            <a href="/post/{{ post['_id'] }}">Read More</a>
+            <form method="post" action="/delete_post/{{ post['_id'] }}">
                 <button type="submit">Delete</button>
             </form>
         </div>
         {% endfor %}
     </div>
+
 </body>
 </html>
