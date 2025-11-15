@@ -1,11 +1,16 @@
 from fastapi import FastAPI, Request, Form, HTTPException, Depends
+from typing import Annotated
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient #async Python driver for MongoDB based on pymongo,Async operations allow your app to handle more requests at the same time, especially when waiting on I/O (like database calls).
 from passlib.context import CryptContext # used to securely hash and verify passwords in your application—especially in authentication systems like login/signup.
 from pydantic import BaseModel
-from starlette.middleware.sessions import SessionMiddleware 
+from bson import ObjectId
+from contextlib import asynccontextmanager
+from pymongo import MongoClient
+from starlette.middleware.sessions import SessionMiddleware
+
 '''When a user logs in (like in your /login/ route), 
 you want to "remember" who they are between requests. You do that by storing a small piece of info in a session, which is backed by cookies.'''
 import os
@@ -56,7 +61,9 @@ async def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 @app.post("/login/")
-async def login_user(request: Request, username: str = Form(...), password: str = Form(...)):
+async def login_user( request: Request,
+    username: Annotated[str, Form()],
+    password: Annotated[str, Form()],):
     user = await users_collection.find_one({"username": username})
     if not user or not verify_password(password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid username or password")
